@@ -1,7 +1,6 @@
 ﻿using System.Net.WebSockets;
 using System.Text;
 using Newtonsoft.Json;
-using PushoverClient;
 
 namespace Gotify2Pushover;
 
@@ -42,8 +41,23 @@ internal class Program
         try
         {
             Console.WriteLine($"Sending to Pushover: {title}:{message}");
-            var c = new Pushover(PushoverAppKey);
-            await c.PushAsync(title, message, PushoverUserKey);
+
+            var parameters = new Dictionary<string, string>
+            {
+                ["token"] = PushoverAppKey,
+                ["user"] = PushoverUserKey,
+                ["message"] = message,
+                ["title"] = title
+            };
+
+            // Replace with your code to send a regular HTTP POST request
+            // Example:
+            using (var client = new HttpClient())
+            {
+                var response = await client.PostAsync("https://api.pushover.net/1/messages.json", new
+                    FormUrlEncodedContent(parameters));
+                response.EnsureSuccessStatusCode();
+            }
         }
         catch (Exception e)
         {
